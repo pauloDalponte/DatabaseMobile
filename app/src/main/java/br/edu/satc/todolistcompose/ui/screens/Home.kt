@@ -24,7 +24,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -45,6 +44,11 @@ fun HomeScreen(taskDao: TaskDao) {
     var showBottomSheet by remember { mutableStateOf(false) }
     var tasks by remember { mutableStateOf(emptyList<TaskTable>()) }
 
+    // Atualiza a lista de tarefas ao inicializar
+    LaunchedEffect(Unit) {
+        tasks = taskDao.getAll()
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -64,8 +68,7 @@ fun HomeScreen(taskDao: TaskDao) {
             )
         }
     ) { innerPadding ->
-        HomeContent(innerPadding, tasks)
-        tasks = taskDao.getAll()
+        HomeContent(innerPadding, tasks, taskDao)
         NewTask(showBottomSheet = showBottomSheet, taskDao = taskDao) {
             showBottomSheet = false
             // Atualiza a lista de tarefas após a inserção
@@ -75,7 +78,7 @@ fun HomeScreen(taskDao: TaskDao) {
 }
 
 @Composable
-fun HomeContent(innerPadding: PaddingValues, tasks: List<TaskTable>) {
+fun HomeContent(innerPadding: PaddingValues, tasks: List<TaskTable>, taskDao: TaskDao) {
     Column(
         modifier = Modifier
             .padding(horizontal = 4.dp)
@@ -85,15 +88,18 @@ fun HomeContent(innerPadding: PaddingValues, tasks: List<TaskTable>) {
         verticalArrangement = Arrangement.Top
     ) {
         for (task in tasks) {
-            TaskCard(task.title ?: "", task.description ?: "", task.status == true)
+            TaskCard(
+                title = task.title ?: "",
+                description = task.description ?: "",
+                isChecked = task.status ?: false,
+                onCheckedChange = { checked ->
+                    // Atualiza o status da tarefa no banco de dados
+                    taskDao.updateTaskStatus(task.uid, checked)
+                }
+            )
         }
     }
 }
-
-/**
- * NewTask abre uma janela estilo "modal". No Android conhecida por BottomSheet.
- * Aqui podemos "cadastrar uma nova Task".
- */
 
 @Composable
 fun NewTask(showBottomSheet: Boolean, taskDao: TaskDao, onComplete: () -> Unit) {
@@ -130,7 +136,7 @@ fun NewTask(showBottomSheet: Boolean, taskDao: TaskDao, onComplete: () -> Unit) 
                     // Insere a nova tarefa no banco de dados
                     scope.launch {
                         try {
-                            taskDao.insertAll(
+                            taskDao.insertTask(
                                 TaskTable(
                                     uid = 0, // AutoGenerate cuida disso
                                     title = taskTitle,
@@ -140,7 +146,6 @@ fun NewTask(showBottomSheet: Boolean, taskDao: TaskDao, onComplete: () -> Unit) 
                             )
                             sheetState.hide()
                         } catch (e: Exception) {
-                            // Tratar o erro, como exibir uma mensagem para o usuário
                             e.printStackTrace()
                         }
                     }.invokeOnCompletion {

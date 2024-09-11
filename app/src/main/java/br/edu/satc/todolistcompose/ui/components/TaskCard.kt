@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ElevatedCard
@@ -30,23 +29,18 @@ import br.edu.satc.todolistcompose.ui.theme.ToDoListComposeTheme
 fun TaskCard(
     title: String = "Task title",
     description: String = "Task description",
-    complete: Boolean = false
+    complete: Boolean = false,
+    onCheckedChange: (Boolean) -> Unit,
+    isChecked: Boolean
 ) {
-    val taskTitle by remember {
-        mutableStateOf(title)
-    }
-    val taskDescription by remember {
-        mutableStateOf(description)
-    }
-    var taskComplete by remember {
-        mutableStateOf(complete)
-    }
+    var taskComplete by remember { mutableStateOf(complete) }
 
     ElevatedCard(
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 6.dp
-        ), modifier = Modifier.padding(top = 8.dp).fillMaxWidth().height(100.dp)
-
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+        modifier = Modifier
+            .padding(top = 8.dp)
+            .fillMaxWidth()
+            .height(100.dp)
     ) {
         Column(
             modifier = Modifier.padding(8.dp).fillMaxWidth()
@@ -57,24 +51,30 @@ fun TaskCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = taskTitle,
+                    text = title,
                     style = TextStyle(
                         fontWeight = FontWeight.Bold,
                         fontSize = 18.sp,
                         fontFamily = FontFamily.Serif
                     )
                 )
-                Checkbox(checked = taskComplete, onCheckedChange = { taskComplete = it })
+                Checkbox(
+                    checked = taskComplete,
+                    onCheckedChange = { checked ->
+                        taskComplete = checked
+                        onCheckedChange(checked)
+                    }
+                )
             }
-            Text(text = taskDescription, fontSize = 12.sp)
+            Text(text = description, fontSize = 12.sp)
         }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun TaskCardPreview() {
-    ToDoListComposeTheme {
-        TaskCard()
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun TaskCardPreview() {
+//    ToDoListComposeTheme {
+//        TaskCard(onCheckedChange = {}, isChecked = taskTa.status ?: false)
+//    }
+//}

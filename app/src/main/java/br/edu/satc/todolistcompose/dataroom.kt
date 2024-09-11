@@ -20,14 +20,17 @@ data class TaskTable(
 @Dao
 interface TaskDao {
 
+    @Insert
+    fun insertTask(task: TaskTable)
+
     @Query("select * from TaskTable")
     fun getAll(): List<TaskTable>
 
     @Update
     fun updateAll(vararg tasks: TaskTable)
 
-    @Insert
-    fun insertAll(vararg tasks: TaskTable)
+    @Query("UPDATE TaskTable SET status = :status WHERE uid = :taskId")
+    fun updateTaskStatus(taskId: Int, status: Boolean)
 
     @Query("DELETE FROM TaskTable")
     fun deleteAllTasks()

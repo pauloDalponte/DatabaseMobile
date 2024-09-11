@@ -25,18 +25,7 @@ class MainActivity : ComponentActivity() {
 
         // Inicializa o TaskDao
         val taskDao = db.taskDao()
-
-
-//        taskDao.deleteAllTasks()
-//
-//        val initialTask = TaskTable(
-//            uid = 0, // ID será autogerado
-//            title = "Tarefa inicial",
-//            description = "Descrição da tarefa inicial",
-//            status = false
-//        )
-//        taskDao.insertAll(initialTask)
-
+        
         // Definindo o conteúdo da tela
         setContent {
             ToDoListComposeTheme {
