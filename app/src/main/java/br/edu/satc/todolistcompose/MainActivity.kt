@@ -1,6 +1,4 @@
 package br.edu.satc.todolistcompose
-
-import AppDatabase
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -11,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.room.Room
 import br.edu.satc.todolistcompose.ui.screens.HomeScreen
 import br.edu.satc.todolistcompose.ui.theme.ToDoListComposeTheme
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,6 +26,14 @@ class MainActivity : ComponentActivity() {
         // Inicializa o TaskDao
         val taskDao = db.taskDao()
 
+        val initialTask = TaskTable(
+            uid = 0, // ID será autogerado
+            title = "Tarefa inicial",
+            description = "Descrição da tarefa inicial",
+            status = false
+        )
+        taskDao.insertAll(initialTask)
+
         // Definindo o conteúdo da tela
         setContent {
             ToDoListComposeTheme {
@@ -40,20 +47,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-
-//@Composable
-//fun Greeting(name: String, modifier: Modifier = Modifier) {
-//    Text(
-//        text = "Hello $name!",
-//        modifier = modifier
-//    )
-//}
-
-//@Preview(showBackground = true)
-//@Composable
-//fun GreetingPreview() {
-//    ToDoListComposeTheme {
-//        Greeting("Android")
-//    }
-//}

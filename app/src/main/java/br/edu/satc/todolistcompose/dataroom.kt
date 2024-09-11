@@ -1,3 +1,5 @@
+package br.edu.satc.todolistcompose
+
 import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Database
@@ -26,6 +28,9 @@ interface TaskDao {
 
     @Insert
     fun insertAll(vararg tasks: TaskTable)
+
+    @Query("DELETE FROM TaskTable")
+    fun deleteAllTasks()
 
 }
 
